@@ -3,27 +3,27 @@ import math
 import os
 import sys
 
-# ── Tile emojis ───────────────────────────────────────────────
-FLOOR  = "🟫"
+# ── Tile emojis ───────────────────────────────────────────────────────────────
+FLOOR = "🟫"
 
-# ── Config ────────────────────────────────────────────────────
+# ── Config ────────────────────────────────────────────────────────────────────
 GRID_SIZE   = 6
 MOVE_BUDGET = 2
 
-# ── Monster roster ────────────────────────────────────────────
+# ── Monster roster ────────────────────────────────────────────────────────────
 MONSTER_TYPES = {
-    "goblin":  dict(emoji="👹", hp=6,  attack=3, chase_radius=5, atk_min=1, atk_max=1),
-    "archer":  dict(emoji="🏹", hp=7,  attack=3, chase_radius=5, atk_min=2, atk_max=3),
-    "fairy":   dict(emoji="🧿", hp=8,  attack=5, chase_radius=6, atk_min=3, atk_max=4),
-    "skeleton":dict(emoji="💀", hp=10, attack=3, chase_radius=3, atk_min=1, atk_max=1),
-    "dragon":  dict(emoji="🐉", hp=25, attack=8, chase_radius=6, atk_min=2, atk_max=5),
-    "snake":   dict(emoji="🐍", hp=6,  attack=2, chase_radius=4, atk_min=1, atk_max=1),
-    "troll":   dict(emoji="🧌", hp=20, attack=6, chase_radius=3, atk_min=1, atk_max=1),
-    "witch":   dict(emoji="🧙‍♀️", hp=9,  attack=7, chase_radius=6, atk_min=4, atk_max=5),
+    "goblin":   dict(emoji="👹",    hp=6,  attack=3, chase_radius=5, atk_min=1, atk_max=1),
+    "archer":   dict(emoji="🏹",    hp=7,  attack=3, chase_radius=5, atk_min=2, atk_max=3),
+    "fairy":    dict(emoji="🧿",    hp=8,  attack=5, chase_radius=6, atk_min=3, atk_max=4),
+    "skeleton": dict(emoji="💀",    hp=10, attack=3, chase_radius=3, atk_min=1, atk_max=1),
+    "dragon":   dict(emoji="🐉",    hp=25, attack=8, chase_radius=6, atk_min=2, atk_max=5),
+    "snake":    dict(emoji="🐍",    hp=6,  attack=2, chase_radius=4, atk_min=1, atk_max=1),
+    "troll":    dict(emoji="🧌",    hp=20, attack=6, chase_radius=3, atk_min=1, atk_max=1),
+    "witch":    dict(emoji="🧙‍♀️", hp=9,  attack=7, chase_radius=6, atk_min=4, atk_max=5),
 }
 
 
-# ── Monster class ─────────────────────────────────────────────
+# ── Monster class ─────────────────────────────────────────────────────────────
 class Monster:
     def __init__(self, x, y, emoji, hp, attack,
                  chase_radius, atk_min, atk_max):
@@ -51,9 +51,9 @@ class Monster:
         if not approach:
             dx, dy = -dx, -dy
         if abs(px - self.x) >= abs(py - self.y):
-            candidates = [(self.x+dx, self.y), (self.x, self.y+dy)]
+            candidates = [(self.x + dx, self.y), (self.x, self.y + dy)]
         else:
-            candidates = [(self.x, self.y+dy), (self.x+dx, self.y)]
+            candidates = [(self.x, self.y + dy), (self.x + dx, self.y)]
         for nx, ny in candidates:
             if 0 <= nx < GRID_SIZE and 0 <= ny < GRID_SIZE and (nx, ny) not in occupied:
                 self.x, self.y = nx, ny
@@ -66,7 +66,7 @@ class Monster:
         return abs(self.x - px) <= 1 and abs(self.y - py) <= 1
 
 
-# ── Spawn helper ──────────────────────────────────────────────
+# ── Spawn helper ──────────────────────────────────────────────────────────────
 def spawn_monsters(counts):
     safe_tiles = [
         (x, y)
@@ -82,8 +82,10 @@ def spawn_monsters(counts):
         if count == 0:
             continue
         if name not in MONSTER_TYPES:
-            raise ValueError(f"Unknown monster type '{name}'. "
-                             f"Choose from: {list(MONSTER_TYPES.keys())}")
+            raise ValueError(
+                f"Unknown monster type '{name}'. "
+                f"Choose from: {list(MONSTER_TYPES.keys())}"
+            )
         stats = MONSTER_TYPES[name]
         for _ in range(count):
             try:
@@ -95,7 +97,7 @@ def spawn_monsters(counts):
     return monsters
 
 
-# ── Game class ────────────────────────────────────────────────
+# ── Game class ────────────────────────────────────────────────────────────────
 class Game:
     def __init__(self, monster_counts=None, player_hp=30, player_atk=5,
                  player_atk_range=1, player_emoji="🧙"):
@@ -112,31 +114,37 @@ class Game:
         self.turn             = 1
         self.monsters         = spawn_monsters(monster_counts)
 
-    # ── Helpers ───────────────────────────────────────────────
+    # ── Helpers ───────────────────────────────────────────────────────────────
     def occupied_tiles(self, exclude=None):
         return {(m.x, m.y) for m in self.monsters if m.alive and m is not exclude}
 
-    # ── Rendering ─────────────────────────────────────────────
+    # ── Rendering ─────────────────────────────────────────────────────────────
     def render(self):
         os.system("cls" if os.name == "nt" else "clear")
         alive = [m for m in self.monsters if m.alive]
-        print(f"  Turn {self.turn}  |  ❤️  HP: {self.player_hp}  |  ⚔️  ATK: {self.player_atk}"
-              f"  |  🎯 Range: {self.player_atk_range}  |  👾 Remaining: {len(alive)}\n")
+        print(
+            f"  Turn {self.turn}  |  ❤️  HP: {self.player_hp}"
+            f"  |  ⚔️  ATK: {self.player_atk}"
+            f"  |  🎯 Range: {self.player_atk_range}"
+            f"  |  👾 Remaining: {len(alive)}\n"
+        )
         for row in range(GRID_SIZE):
             line = ""
             for col in range(GRID_SIZE):
                 if col == self.player_x and row == self.player_y:
                     line += self.player_emoji
                     continue
-                mon = next((m for m in self.monsters
-                            if m.alive and m.x == col and m.y == row), None)
+                mon = next(
+                    (m for m in self.monsters if m.alive and m.x == col and m.y == row),
+                    None
+                )
                 line += mon.emoji if mon else self.grid[row][col]
             print(line)
         print()
 
-    # ── Player movement ───────────────────────────────────────
+    # ── Player movement ───────────────────────────────────────────────────────
     def player_turn(self):
-        dirs = {"w": (0,-1), "s": (0,1), "a": (-1,0), "d": (1,0)}
+        dirs = {"w": (0, -1), "s": (0, 1), "a": (-1, 0), "d": (1, 0)}
         moves_left = MOVE_BUDGET
         while moves_left > 0:
             self.render()
@@ -150,20 +158,26 @@ class Game:
             dx, dy = dirs[key]
             nx, ny = self.player_x + dx, self.player_y + dy
             if not (0 <= nx < GRID_SIZE and 0 <= ny < GRID_SIZE):
-                print("  Can't move there."); input("  [Enter]"); continue
+                print("  Can't move there.")
+                input("  [Enter]")
+                continue
             if any(m.alive and m.x == nx and m.y == ny for m in self.monsters):
-                print("  A monster is blocking that tile!"); input("  [Enter]"); continue
+                print("  A monster is blocking that tile!")
+                input("  [Enter]")
+                continue
             self.player_x, self.player_y = nx, ny
             moves_left -= 1
 
-    # ── Action phase ──────────────────────────────────────────
+    # ── Action phase ──────────────────────────────────────────────────────────
     def action_phase(self):
         self.render()
         print("  Action phase")
         print("  [1] Attack   [2] Rest (+3 HP)   [3] Wait\n")
         targets = [
             m for m in self.monsters
-            if m.alive and math.dist((self.player_x, self.player_y), (m.x, m.y)) <= self.player_atk_range
+            if m.alive and math.dist(
+                (self.player_x, self.player_y), (m.x, m.y)
+            ) <= self.player_atk_range
         ]
         if targets:
             print("  Monsters in range: "
@@ -188,7 +202,7 @@ class Game:
             print(f"  You rest. HP: {self.player_hp}")
             input("  [Enter]")
 
-    # ── Monster turn ──────────────────────────────────────────
+    # ── Monster turn ──────────────────────────────────────────────────────────
     def monster_turn(self):
         attacked = False
         for m in self.monsters:
@@ -204,7 +218,7 @@ class Game:
         if attacked:
             input("  [Enter]")
 
-    # ── Main loop ─────────────────────────────────────────────
+    # ── Main loop ─────────────────────────────────────────────────────────────
     def run(self):
         while self.player_hp > 0:
             if all(not m.alive for m in self.monsters):
@@ -220,197 +234,236 @@ class Game:
         sys.exit()
 
 
-# ── Launch ────────────────────────────────────────────────────
+# ── Launch helper ─────────────────────────────────────────────────────────────
 def start_encounter(counts, player_hp, player_atk, player_atk_range, player_emoji):
-    Game(counts, player_hp=player_hp, player_atk=player_atk,
-         player_atk_range=player_atk_range, player_emoji=player_emoji).run()
+    Game(
+        counts,
+        player_hp=player_hp,
+        player_atk=player_atk,
+        player_atk_range=player_atk_range,
+        player_emoji=player_emoji,
+    ).run()
 
 
-# ----------------------------------------
-# Actual game code beyond this point!
-# ----------------------------------------
-level_p = 1
+# ── Helper: prompt until valid choice ────────────────────────────────────────
+def prompt_choice(prompt, valid_options):
+    """Repeatedly prompt until the player enters one of valid_options (uppercase)."""
+    while True:
+        choice = input(prompt).strip().upper()
+        if choice in valid_options:
+            return choice
+        valid_str = ", ".join(valid_options)
+        print(f"  Please enter a valid option ({valid_str})!")
 
-valid_input1 = False
-while not valid_input1:
-    player_class_selection = input(
-        "Please choose one of the classes below:\n"
-        " A) Warrior: A martial fighter, focusing on strength.\n"
-        " B) Mage: An arcane user of magic, focusing on intelligence but with low health.\n"
-        " C) Thief: A cunning rogue, focusing on stealth to sneak around.\n"
-    ).strip().upper()
 
-    if player_class_selection == "A":
-        player_class   = "Warrior"
-        strength_p     = 15
-        dexterity_p    = 14
-        constitution_p = 13
-        intelligence_p = 8
-        health_p       = int(10 * level_p + (constitution_p / 10))
-        attack_p       = 4
-        atk_range_p    = 1
-        player_emoji_p = "🤺"
-        valid_input1   = True
+# ── Helper: compute HP from level and constitution ────────────────────────────
+def calc_hp(level, constitution):
+    return int(10 * level + constitution / 10)
 
-    elif player_class_selection == "B":
-        player_class   = "Mage"
-        strength_p     = 8
-        dexterity_p    = 12
-        constitution_p = 13
-        intelligence_p = 15
-        health_p       = int(10 * level_p + (constitution_p / 10))
-        attack_p       = 5
-        atk_range_p    = 5
-        player_emoji_p = "🧙"
-        valid_input1   = True
 
-    elif player_class_selection == "C":
-        player_class   = "Thief"
-        strength_p     = 12
-        dexterity_p    = 15
-        constitution_p = 13
-        intelligence_p = 14
-        health_p       = int(10 * level_p + (constitution_p / 10))
-        attack_p       = 3
-        atk_range_p    = 3
-        player_emoji_p = "🥷🏻"
-        valid_input1   = True
+# ═════════════════════════════════════════════════════════════════════════════
+# Game start
+# ═════════════════════════════════════════════════════════════════════════════
 
-    else:
-        print("Please enter a valid option (A, B, or C)!")
+# ── Class selection ───────────────────────────────────────────────────────────
+CLASS_PROMPT = (
+    "Please choose one of the classes below:\n"
+    "  A) Warrior: A martial fighter, focusing on strength.\n"
+    "  B) Mage: An arcane user of magic, focusing on intelligence but with low health.\n"
+    "  C) Thief: A cunning rogue, focusing on stealth to sneak around.\n"
+)
 
-print("You have selected: " + player_class)
+CLASSES = {
+    "A": dict(
+        name="Warrior", emoji="🤺",
+        strength=15, dexterity=14, constitution=13, intelligence=8,
+        attack=4, atk_range=1,
+    ),
+    "B": dict(
+        name="Mage", emoji="🧙",
+        strength=8, dexterity=12, constitution=13, intelligence=15,
+        attack=5, atk_range=5,
+    ),
+    "C": dict(
+        name="Thief", emoji="🥷🏻",
+        strength=12, dexterity=15, constitution=13, intelligence=14,
+        attack=3, atk_range=3,
+    ),
+}
+
+level_p        = 1
+selection      = prompt_choice(CLASS_PROMPT, CLASSES.keys())
+cls            = CLASSES[selection]
+player_class   = cls["name"]
+player_emoji_p = cls["emoji"]
+strength_p     = cls["strength"]
+dexterity_p    = cls["dexterity"]
+constitution_p = cls["constitution"]
+intelligence_p = cls["intelligence"]
+attack_p       = cls["attack"]
+atk_range_p    = cls["atk_range"]
+health_p       = calc_hp(level_p, constitution_p)
+
+print(f"\nYou have selected: {player_class}")
 name_p = input("Please enter a name for your character: ")
 print(
-    "Player description:\n"
-    " Name: "         + name_p              + "\n"
-    " Class: "        + player_class        + "\n"
-    " Health: "       + str(health_p)       + "\n"
-    " Attack: "       + str(attack_p)       + "\n"
-    " Attack Range: " + str(atk_range_p)    + "\n"
-    " Strength: "     + str(strength_p)     + "\n"
-    " Dexterity: "    + str(dexterity_p)    + "\n"
-    " Constitution: " + str(constitution_p) + "\n"
-    " Intelligence: " + str(intelligence_p) + "\n"
-    " ========================================"
+    f"\nPlayer description:\n"
+    f"  Name:          {name_p}\n"
+    f"  Class:         {player_class}\n"
+    f"  Health:        {health_p}\n"
+    f"  Attack:        {attack_p}\n"
+    f"  Attack Range:  {atk_range_p}\n"
+    f"  Strength:      {strength_p}\n"
+    f"  Dexterity:     {dexterity_p}\n"
+    f"  Constitution:  {constitution_p}\n"
+    f"  Intelligence:  {intelligence_p}\n"
+    f"  {'=' * 40}"
 )
-print("Welcome to Mageborne! Below is a little preface to the story (Beta Version)")
+
+# ── Introduction ──────────────────────────────────────────────────────────────
+print("Welcome to Mageborne! Below is a little preface to the story (Beta Version)\n")
 print(
-    f"Hello, {name_p}. You have been hired by the townspeople of Emberpine to investigate "
+    f"Hello, {name_p}. You have been hired by the townspeople of Emberpine to investigate\n"
     "the nearby woods, after large monster tracks were found.\n"
-    "The game starts with you at the entrance of the woods, where you'll walk through "
+    "The game starts with you at the entrance of the woods, where you'll walk through\n"
     "and face different types of monsters."
 )
-print("========================================\n")
+print(f"\n{'=' * 40}\n")
 
-path_1 = input(
+# ── Chapter 1: The Woods ──────────────────────────────────────────────────────
+CHAPTER1_PROMPT = (
     "You enter the woods, what would you like to do?\n"
-    " A) Search for clues\n"
-    " B) Follow the trail\n"
-    " C) Try to attract a monster\n"
-).strip().upper()
+    "  A) Search for clues\n"
+    "  B) Follow the trail\n"
+    "  C) Try to attract a monster\n"
+)
 
-valid_input2 = False
-while not valid_input2:
+path_1 = prompt_choice(CHAPTER1_PROMPT, {"A", "B", "C"})
+
+while True:
     if path_1 == "A":
-        roll = random.randint(1, 20) + (intelligence_p / 10)
-        print("You rolled a " + str(roll) + " total for perception.")
+        roll = random.randint(1, 20) + intelligence_p / 10
+        print(f"  You rolled a {roll:.1f} total for perception.")
         if roll >= 14:
-            print("You find some torn fabric on the branches, leading towards a clearing. "
-                  "Inside, stands 3 small goblins. Prepare for combat!")
-            valid_input2 = True
-            start_encounter({"goblin": 3}, player_hp=health_p, player_atk=attack_p,
-                            player_atk_range=atk_range_p, player_emoji=player_emoji_p)
+            print(
+                "  You find some torn fabric on the branches, leading towards a clearing.\n"
+                "  Inside, stands 3 small goblins. Prepare for combat!"
+            )
+            start_encounter(
+                {"goblin": 3}, player_hp=health_p, player_atk=attack_p,
+                player_atk_range=atk_range_p, player_emoji=player_emoji_p,
+            )
+            break
         else:
-            print("You don't notice any evidence of monsters, "
-                  "maybe you should try again or a different tactic.")
-            path_1 = input(
-                "What would you like to do?\n"
-                " A) Search for clues\n"
-                " B) Follow the trail\n"
-                " C) Try to attract a monster\n"
-            ).strip().upper()
+            print("  You don't notice any evidence of monsters — maybe try again or a different tactic.")
+            path_1 = prompt_choice(CHAPTER1_PROMPT, {"A", "B", "C"})
 
     elif path_1 == "B":
-        print("You follow the trail and eventually find a log laying across it, "
-              "a further look reveals that it was deliberately placed there. "
-              "As you look around, you notice a new, smaller path leading towards a clearing. "
-              "Inside, stands 3 small goblins. Prepare for combat!")
-        valid_input2 = True
-        start_encounter({"goblin": 3}, player_hp=health_p, player_atk=attack_p,
-                        player_atk_range=atk_range_p, player_emoji=player_emoji_p)
+        print(
+            "  You follow the trail and eventually find a log laying across it.\n"
+            "  A further look reveals it was deliberately placed there.\n"
+            "  As you look around, you notice a smaller path leading to a clearing.\n"
+            "  Inside, stands 3 small goblins. Prepare for combat!"
+        )
+        start_encounter(
+            {"goblin": 3}, player_hp=health_p, player_atk=attack_p,
+            player_atk_range=atk_range_p, player_emoji=player_emoji_p,
+        )
+        break
 
     elif path_1 == "C":
-        print("You make some noise and lay out some aromatic food around you, hoping to attract "
-              "a monster. After a few minutes, you hear hushed voices leading towards a clearing. "
-              "Inside, stands 3 small goblins. Prepare for combat!")
-        valid_input2 = True
-        start_encounter({"goblin": 3}, player_hp=health_p, player_atk=attack_p,
-                        player_atk_range=atk_range_p, player_emoji=player_emoji_p)
+        print(
+            "  You make some noise and lay out aromatic food around you, hoping to attract a monster.\n"
+            "  After a few minutes, you hear hushed voices leading towards a clearing.\n"
+            "  Inside, stands 3 small goblins. Prepare for combat!"
+        )
+        start_encounter(
+            {"goblin": 3}, player_hp=health_p, player_atk=attack_p,
+            player_atk_range=atk_range_p, player_emoji=player_emoji_p,
+        )
+        break
 
-    else:
-        print("Please enter a valid option (A, B, or C)!")
-        path_1 = input(
-            "What would you like to do?\n"
-            " A) Search for clues\n"
-            " B) Follow the trail\n"
-            " C) Try to attract a monster\n"
-        ).strip().upper()
-level_p = 2
-health_p = int(10 * level_p + (constitution_p / 10))
-print("Congratulations! You're now level 2")
-path_2 = input(
+# ── Level up: 1 → 2 ───────────────────────────────────────────────────────────
+level_p  = 2
+health_p = calc_hp(level_p, constitution_p)
+print(f"\n  Congratulations! You're now level {level_p}.\n")
+
+# ── Chapter 2: The Fairies ────────────────────────────────────────────────────
+CHAPTER2_PROMPT = (
     "What would you like to do?\n"
-    " A) Inspect Goblin footprints\n"
-    " B) Keep searching\n"
-).strip().upper()
-valid_input3 = False
-while not valid_input3:
+    "  A) Inspect goblin footprints\n"
+    "  B) Keep searching\n"
+)
+
+path_2 = prompt_choice(CHAPTER2_PROMPT, {"A", "B"})
+
+while True:
     if path_2 == "A":
-        print("You take a look at the footprints left by the Goblins. It's clear they aren't the culprits of whatever was near town. As you begin to wonder who else could be guilty, you hear giggling up ahead. As you follow the noise, you come up on another clearing, this time with 2 fairies inside. Prepare for combat!")
-        valid_input3 = True
-        start_encounter({"fairy": 2}, player_hp=health_p, player_atk=attack_p,
-                        player_atk_range=atk_range_p, player_emoji=player_emoji_p)
-    elif path_2 == "B":
-        print("As you look around, you notice some shimmering, magical dust on the branches. As you follow the dust's trail, you come up on another clearing, this time with 2 fairies inside. Prepare for combat!")
-        valid_input3 = True
-        start_encounter({"fairy": 2}, player_hp=health_p, player_atk=attack_p,
-                        player_atk_range=atk_range_p, player_emoji=player_emoji_p)
-    else:
-        print("Please enter a valid option (A or B)!")
-        path_2 = input(
-            "What would you like to do?\n"
-            " A) Inspect Goblin footprints\n"
-            " B) Keep searching\n"
-        ).strip().upper()
-level_p = 3
-health_p = int(10 * level_p + (constitution_p / 10))
-print("Congratulations! You're now level 3")
-path_3 = input(
-    "What would you like to do?\n"
-    " A) Inspect Fairy footprints\n"
-    " B) Keep searching\n"
-).strip().upper()
-valid_input3 = False
-while not valid_input3:
-    if path_3 == "A":
-        print("You take a look at the footprints left by the Fairies. It's clear they aren't the culprits of whatever was near town. As you begin to wonder who else could be guilty, you hear loud growling up ahead. As you follow the noise, you come up on another clearing, this time with a large Troll inside. Prepare for combat!")
-        valid_input3 = True
-        start_encounter({"troll": 1}, player_hp=health_p, player_atk=attack_p,
-                        player_atk_range=atk_range_p, player_emoji=player_emoji_p)
-    elif path_3 == "B":
-        print("As you look around, you notice a large piece of fabric strung on a tree's branches, along with smoke rising ahead. As you the smoke towards the fabric, you come up on another clearing. This one has a large Troll inside. Prepare for combat!")
-        valid_input3 = True
-        start_encounter({"troll": 1}, player_hp=health_p, player_atk=attack_p,
-                        player_atk_range=atk_range_p, player_emoji=player_emoji_p)
-    else:
-        print("Please enter a valid option (A or B)!")
-        path_3 = input(
-            "What would you like to do?\n"
-            " A) Inspect Fairy footprints\n"
-            " B) Keep searching\n"
-        ).strip().upper()
+        print(
+            "  You examine the footprints left by the goblins — clearly not the culprits.\n"
+            "  As you wonder who else could be responsible, you hear giggling up ahead.\n"
+            "  Following the sound, you come upon a clearing with 2 fairies inside. Prepare for combat!"
+        )
+        start_encounter(
+            {"fairy": 2}, player_hp=health_p, player_atk=attack_p,
+            player_atk_range=atk_range_p, player_emoji=player_emoji_p,
+        )
+        break
 
-print("Once the Troll has been defeated, it's evident it was the culprit of those monster tracks.\n"
-      "You head back to town to recieve your payment and deliver the good news, tired from your day of monster fighting.\n" \
-      "\n Congrats! You've successfully completed Mageborne: Beta Test Release! The full Godot version will be released soon, and the full base game afterwards.")
+    elif path_2 == "B":
+        print(
+            "  As you look around, you notice shimmering magical dust on the branches.\n"
+            "  Following the trail, you come upon a clearing with 2 fairies inside. Prepare for combat!"
+        )
+        start_encounter(
+            {"fairy": 2}, player_hp=health_p, player_atk=attack_p,
+            player_atk_range=atk_range_p, player_emoji=player_emoji_p,
+        )
+        break
+
+# ── Level up: 2 → 3 ───────────────────────────────────────────────────────────
+level_p  = 3
+health_p = calc_hp(level_p, constitution_p)
+print(f"\n  Congratulations! You're now level {level_p}.\n")
+
+# ── Chapter 3: The Troll ──────────────────────────────────────────────────────
+CHAPTER3_PROMPT = (
+    "What would you like to do?\n"
+    "  A) Inspect fairy footprints\n"
+    "  B) Keep searching\n"
+)
+
+path_3 = prompt_choice(CHAPTER3_PROMPT, {"A", "B"})
+
+while True:
+    if path_3 == "A":
+        print(
+            "  You examine the footprints left by the fairies — not the culprits either.\n"
+            "  As you wonder who is truly responsible, you hear loud growling up ahead.\n"
+            "  Following the noise, you come upon a clearing with a large Troll inside. Prepare for combat!"
+        )
+        start_encounter(
+            {"troll": 1}, player_hp=health_p, player_atk=attack_p,
+            player_atk_range=atk_range_p, player_emoji=player_emoji_p,
+        )
+        break
+
+    elif path_3 == "B":
+        print(
+            "  You notice a large piece of fabric strung on the branches, along with smoke rising ahead.\n"
+            "  Following the smoke, you come upon a clearing with a large Troll inside. Prepare for combat!"
+        )
+        start_encounter(
+            {"troll": 1}, player_hp=health_p, player_atk=attack_p,
+            player_atk_range=atk_range_p, player_emoji=player_emoji_p,
+        )
+        break
+
+# ── Ending ────────────────────────────────────────────────────────────────────
+print(
+    "\n  Once the Troll has been defeated, it's evident it was the culprit behind those monster tracks.\n"
+    "  You head back to town to receive your payment and deliver the good news,\n"
+    "  tired but victorious from your day of monster fighting.\n"
+    "\n  Congratulations! You've successfully completed Mageborne: Beta Test Release!\n"
+    "  The full Godot version will be released soon, and the full base game afterwards."
+)
