@@ -1,134 +1,197 @@
 import random
+import os
+from mageborne.game import start_encounter
+from mageborne.player_classes import CLASSES
+from mageborne.player import calc_hp
 
-from game import Game
-from player_classes import PLAYER_CLASSES
-
-
-def fight(player, counts):
-    Game(player, counts).run()
-
-
-def choose_class_and_name():
-    menu = "Please choose one of the classes below:\n" + "".join(
-        f" {key}) {cls.class_name}: {cls.description}\n"
-        for key, cls in PLAYER_CLASSES.items()
-    )
+def prompt_choice(prompt, valid_options):
     while True:
-        choice = input(menu).strip().upper()
-        if choice in PLAYER_CLASSES:
-            break
-        print("Please enter a valid option (A, B, or C)!")
-
-    cls = PLAYER_CLASSES[choice]
-    print("You have selected: " + cls.class_name)
-    name = input("Please enter a name for your character: ")
-    return cls(name)
-
+        choice = input(prompt).strip().upper()
+        if choice in valid_options:
+            return choice
+        valid_str = ", ".join(sorted(valid_options))
+        print(f"  Please enter a valid option ({valid_str})!")
 
 def main():
-    player = choose_class_and_name()
-    player.describe()
+    CLASS_PROMPT = (
+        "Please choose one of the classes below:\n"
+        "  A) Warrior: A martial fighter, focusing on strength.\n"
+        "  B) Mage: An arcane user of magic, focusing on intelligence but with low health.\n"
+        "  C) Thief: A cunning rogue, focusing on stealth to sneak around.\n"
+    )
 
-    print("Welcome to Mageborne! Below is a little preface to the story (Beta Version)")
+    level_p        = 1
+    selection      = prompt_choice(CLASS_PROMPT, CLASSES.keys())
+    cls            = CLASSES[selection]
+    player_class   = cls["name"]
+    player_emoji_p = cls["emoji"]
+    strength_p     = cls["strength"]
+    dexterity_p    = cls["dexterity"]
+    constitution_p = cls["constitution"]
+    intelligence_p = cls["intelligence"]
+    attack_p       = cls["attack"]
+    atk_range_p    = cls["atk_range"]
+    health_p       = calc_hp(level_p, constitution_p)
+
+    print(f"\nYou have selected: {player_class}")
+    name_p = input("Please enter a name for your character: ")
     print(
-        f"Hello, {player.name}. You have been hired by the townspeople of Emberpine to investigate "
+        f"\nPlayer description:\n"
+        f"  Name:          {name_p}\n"
+        f"  Class:         {player_class}\n"
+        f"  Health:        {health_p}\n"
+        f"  Attack:        {attack_p}\n"
+        f"  Attack Range:  {atk_range_p}\n"
+        f"  Strength:      {strength_p}\n"
+        f"  Dexterity:     {dexterity_p}\n"
+        f"  Constitution:  {constitution_p}\n"
+        f"  Intelligence:  {intelligence_p}\n"
+        f"  {'=' * 40}"
+    )
+    input("\n  [Press Enter to begin your adventure]")
+
+    os.system("cls" if os.name == "nt" else "clear")
+    print("Welcome to Mageborne! Below is a little preface to the story (Beta Version)\n")
+    print(
+        f"Hello, {name_p}. You have been hired by the townspeople of Emberpine to investigate\n"
         "the nearby woods, after large monster tracks were found.\n"
-        "The game starts with you at the entrance of the woods, where you'll walk through "
+        "The game starts with you at the entrance of the woods, where you'll walk through\n"
         "and face different types of monsters."
     )
-    print("========================================\n")
+    print(f"\n{'=' * 40}")
+    input("\n  [Press Enter to enter the woods]")
 
-    # ── Chapter 1: goblins ────────────────────────────────────
-    menu_1 = (
-        "What would you like to do?\n"
-        " A) Search for clues\n"
-        " B) Follow the trail\n"
-        " C) Try to attract a monster\n"
+    CHAPTER1_PROMPT = (
+        "\nYou enter the woods, what would you like to do?\n"
+        "  A) Search for clues\n"
+        "  B) Follow the trail\n"
+        "  C) Try to attract a monster\n"
     )
-    path_1 = input("You enter the woods, " + menu_1[0].lower() + menu_1[1:]).strip().upper()
 
-    done = False
-    while not done:
+    while True:
+        os.system("cls" if os.name == "nt" else "clear")
+        path_1 = prompt_choice(CHAPTER1_PROMPT, {"A", "B", "C"})
+
         if path_1 == "A":
-            roll = random.randint(1, 20) + (player.intelligence / 10)
-            print("You rolled a " + str(roll) + " total for perception.")
+            roll = random.randint(1, 20) + intelligence_p / 10
+            print(f"\n  You rolled a {roll:.1f} total for perception.")
             if roll >= 14:
-                print("You find some torn fabric on the branches, leading towards a clearing. "
-                      "Inside, stands 3 small goblins. Prepare for combat!")
-                done = True
-                fight(player, {"goblin": 3})
+                print(
+                    "  You find some torn fabric on the branches, leading towards a clearing.\n"
+                    "  Inside, stands 3 small goblins. Prepare for combat!"
+                )
+                input("\n  [Press Enter to start combat]")
+                start_encounter(
+                    {"goblin": 3}, player_hp=health_p, player_atk=attack_p,
+                    player_atk_range=atk_range_p, player_emoji=player_emoji_p,
+                )
+                break
             else:
-                print("You don't notice any evidence of monsters, "
-                      "maybe you should try again or a different tactic.")
-                path_1 = input(menu_1).strip().upper()
+                print("  You don't notice any evidence of monsters — searching again...")
+                input("\n  [Press Enter to try another tactic]")
 
         elif path_1 == "B":
-            print("You follow the trail and eventually find a log laying across it, "
-                  "a further look reveals that it was deliberately placed there. "
-                  "As you look around, you notice a new, smaller path leading towards a clearing. "
-                  "Inside, stands 3 small goblins. Prepare for combat!")
-            done = True
-            fight(player, {"goblin": 3})
+            print(
+                "\n  You follow the trail and eventually find a log laying across it.\n"
+                "  A further look reveals it was deliberately placed there.\n"
+                "  As you look around, you notice a smaller path leading to a clearing.\n"
+                "  Inside, stands 3 small goblins. Prepare for combat!"
+            )
+            input("\n  [Press Enter to start combat]")
+            start_encounter(
+                {"goblin": 3}, player_hp=health_p, player_atk=attack_p,
+                player_atk_range=atk_range_p, player_emoji=player_emoji_p,
+            )
+            break
 
         elif path_1 == "C":
-            print("You make some noise and lay out some aromatic food around you, hoping to attract "
-                  "a monster. After a few minutes, you hear hushed voices leading towards a clearing. "
-                  "Inside, stands 3 small goblins. Prepare for combat!")
-            done = True
-            fight(player, {"goblin": 3})
+            print(
+                "\n  You make some noise and lay out aromatic food around you, hoping to attract a monster.\n"
+                "  After a few minutes, you hear hushed voices leading towards a clearing.\n"
+                "  Inside, stands 3 small goblins. Prepare for combat!"
+            )
+            input("\n  [Press Enter to start combat]")
+            start_encounter(
+                {"goblin": 3}, player_hp=health_p, player_atk=attack_p,
+                player_atk_range=atk_range_p, player_emoji=player_emoji_p,
+            )
+            break
 
-        else:
-            print("Please enter a valid option (A, B, or C)!")
-            path_1 = input(menu_1).strip().upper()
+    level_p  = 2
+    health_p = calc_hp(level_p, constitution_p)
+    os.system("cls" if os.name == "nt" else "clear")
+    print(f"\n  🎉 Congratulations! You're now level {level_p}.\n")
+    input("  [Press Enter to continue to Chapter 2]")
 
-    # ── Chapter 2: Fairies ────────────────────────────────────
-    player.level_up()
-    menu_2 = (
-        "What would you like to do?\n"
-        " A) Inspect Goblin footprints\n"
-        " B) Keep searching\n"
+    CHAPTER2_PROMPT = (
+        "\nWhat would you like to do?\n"
+        "  A) Inspect goblin footprints\n"
+        "  B) Keep searching\n"
     )
-    path_2 = input(menu_2).strip().upper()
-    done = False
-    while not done:
-        if path_2 == "A":
-            print("You take a look at the footprints left by the Goblins. It's clear they aren't the culprits of whatever was near town. As you begin to wonder who else could be guilty, you hear giggling up ahead. As you follow the noise, you come up on another clearing, this time with 2 fairies inside. Prepare for combat!")
-            done = True
-            fight(player, {"fairy": 2})
-        elif path_2 == "B":
-            print("As you look around, you notice some shimmering, magical dust on the branches. As you follow the dust's trail, you come up on another clearing, this time with 2 fairies inside. Prepare for combat!")
-            done = True
-            fight(player, {"fairy": 2})
-        else:
-            print("Please enter a valid option (A or B)!")
-            path_2 = input(menu_2).strip().upper()
 
-    # ── Chapter 3: Troll ──────────────────────────────────────
-    player.level_up()
-    menu_3 = (
-        "What would you like to do?\n"
-        " A) Inspect Fairy footprints\n"
-        " B) Keep searching\n"
+    os.system("cls" if os.name == "nt" else "clear")
+    path_2 = prompt_choice(CHAPTER2_PROMPT, {"A", "B"})
+
+    if path_2 == "A":
+        print(
+            "\n  You examine the footprints left by the goblins — clearly not the culprits.\n"
+            "  As you wonder who else could be responsible, you hear giggling up ahead.\n"
+            "  Following the sound, you come upon a clearing with 2 fairies inside. Prepare for combat!"
+        )
+    else:
+        print(
+            "\n  As you look around, you notice shimmering magical dust on the branches.\n"
+            "  Following the trail, you come upon a clearing with 2 fairies inside. Prepare for combat!"
+        )
+
+    input("\n  [Press Enter to start combat]")
+    start_encounter(
+        {"fairy": 2}, player_hp=health_p, player_atk=attack_p,
+        player_atk_range=atk_range_p, player_emoji=player_emoji_p,
     )
-    path_3 = input(menu_3).strip().upper()
-    done = False
-    while not done:
-        if path_3 == "A":
-            print("You take a look at the footprints left by the Fairies. It's clear they aren't the culprits of whatever was near town. As you begin to wonder who else could be guilty, you hear loud growling up ahead. As you follow the noise, you come up on another clearing, this time with a large Troll inside. Prepare for combat!")
-            done = True
-            fight(player, {"troll": 1})
-        elif path_3 == "B":
-            print("As you look around, you notice a large piece of fabric strung on a tree's branches, along with smoke rising ahead. As you the smoke towards the fabric, you come up on another clearing. This one has a large Troll inside. Prepare for combat!")
-            done = True
-            fight(player, {"troll": 1})
-        else:
-            print("Please enter a valid option (A or B)!")
-            path_3 = input(menu_3).strip().upper()
 
-    print("Once the Troll has been defeated, it's evident it was the culprit of those monster tracks.\n"
-          "You head back to town to recieve your payment and deliver the good news, tired from your day of monster fighting.\n"
-          "\n Congrats! You've successfully completed Mageborne: Beta Test Release! The full Godot version will be released soon, and the full base game afterwards.")
+    level_p  = 3
+    health_p = calc_hp(level_p, constitution_p)
+    os.system("cls" if os.name == "nt" else "clear")
+    print(f"\n  🎉 Congratulations! You're now level {level_p}.\n")
+    input("  [Press Enter to continue to Chapter 3]")
 
+    CHAPTER3_PROMPT = (
+        "\nWhat would you like to do?\n"
+        "  A) Inspect fairy footprints\n"
+        "  B) Keep searching\n"
+    )
+
+    os.system("cls" if os.name == "nt" else "clear")
+    path_3 = prompt_choice(CHAPTER3_PROMPT, {"A", "B"})
+
+    if path_3 == "A":
+        print(
+            "\n  You examine the footprints left by the fairies — not the culprits either.\n"
+            "  As you wonder who is truly responsible, you hear loud growling up ahead.\n"
+            "  Following the noise, you come upon a clearing with a large Troll inside. Prepare for combat!"
+        )
+    else:
+        print(
+            "\n  You notice a large piece of fabric strung on the branches, along with smoke rising ahead.\n"
+            "  Following the smoke, you come upon a clearing with a large Troll inside. Prepare for combat!"
+        )
+
+    input("\n  [Press Enter to start boss combat]")
+    start_encounter(
+        {"troll": 1}, player_hp=health_p, player_atk=attack_p,
+        player_atk_range=atk_range_p, player_emoji=player_emoji_p,
+    )
+
+    os.system("cls" if os.name == "nt" else "clear")
+    print(
+        "\n  Once the Troll has been defeated, it's evident it was the culprit behind those monster tracks.\n"
+        "  You head back to town to receive your payment and deliver the good news,\n"
+        "  tired but victorious from your day of monster fighting.\n"
+        "\n  Congratulations! You've successfully completed Mageborne: Beta Test Release!\n"
+        "  The full Godot version will be released soon, and the full base game afterwards."
+    )
+    input("\n  [Press Enter to exit]")
 
 if __name__ == "__main__":
     main()
