@@ -19,6 +19,7 @@ class Player:
     # Combat stats
     attack    = 3
     atk_range = 1
+    speed     = 2      # tiles it can walk per turn
 
     def __init__(self, name, level=1):
         self.name  = name
@@ -26,23 +27,24 @@ class Player:
 
     @property
     def health(self):
-        return int(10 * self.level + (self.constitution / 10))
+        return int(8 * self.level + self.constitution)
 
     def level_up(self):
         self.level += 1
-        print(f"Congratulations! You're now level {self.level}")
+        return self.level
 
     def describe(self):
         print(
-            "Player description:\n"
-            f" Name: {self.name}\n"
-            f" Class: {self.class_name}\n"
-            f" Health: {self.health}\n"
-            f" Attack: {self.attack}\n"
-            f" Attack Range: {self.atk_range}\n"
-            f" Strength: {self.strength}\n"
-            f" Dexterity: {self.dexterity}\n"
-            f" Constitution: {self.constitution}\n"
-            f" Intelligence: {self.intelligence}\n"
-            " ========================================"
+            f"\nPlayer description:\n"
+            f"  Name:          {self.name}\n"
+            f"  Class:         {self.class_name}\n"
+            f"  Health:        {self.health}\n"
+            f"  Attack:        {self.attack}\n"
+            f"  Attack Range:  {self.atk_range}\n"
+            f"  Speed:         {self.speed}\n"
+            f"  Strength:      {self.strength}\n"
+            f"  Dexterity:     {self.dexterity}\n"
+            f"  Constitution:  {self.constitution}\n"
+            f"  Intelligence:  {self.intelligence}\n"
+            f"  {'=' * 40}"
         )

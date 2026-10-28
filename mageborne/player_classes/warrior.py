@@ -7,9 +7,10 @@ class Warrior(Player):
     emoji       = "🤺"
 
     strength     = 15
-    dexterity    = 14
-    constitution = 13
+    dexterity    = 11
+    constitution = 16
     intelligence = 8
 
-    attack    = 4
+    attack    = 7
     atk_range = 1
+    speed     = 2

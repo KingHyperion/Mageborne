@@ -1,0 +1,142 @@
+{
+  "title": "Mageborne: The Emberpine Woods",
+  "description": "The original beta adventure.",
+  "start": "intro",
+  "scenes": {
+
+    "intro": {
+      "text": [
+        "Welcome to Mageborne! Below is a little preface to the story (Beta Version)",
+        "",
+        "Hello, {name}. You have been hired by the townspeople of Emberpine to investigate",
+        "the nearby woods, after large monster tracks were found.",
+        "The game starts with you at the entrance of the woods, where you'll walk through",
+        "and face different types of monsters.",
+        "",
+        "========================================"
+      ],
+      "continue_prompt": "Press Enter to enter the woods",
+      "next": "woods"
+    },
+
+    "woods": {
+      "text": "You enter the woods, what would you like to do?",
+      "choices": [
+        {
+          "text": "Search for clues",
+          "goto": "goblins_clues",
+          "check": {
+            "stat": "intelligence", "dc": 14, "label": "perception",
+            "fail_text": "You don't notice any evidence of monsters — searching again..."
+          }
+        },
+        { "text": "Follow the trail",          "goto": "goblins_trail" },
+        { "text": "Try to attract a monster",  "goto": "goblins_bait" }
+      ]
+    },
+
+    "goblins_clues": {
+      "text": [
+        "You find some torn fabric on the branches, leading towards a clearing.",
+        "Inside, stands 3 small goblins. Prepare for combat!"
+      ],
+      "encounter": { "goblin": 3 },
+      "level_up": true,
+      "continue_prompt": "Press Enter to continue to Chapter 2",
+      "next": "chapter2"
+    },
+    "goblins_trail": {
+      "text": [
+        "You follow the trail and eventually find a log laying across it.",
+        "A further look reveals it was deliberately placed there.",
+        "As you look around, you notice a smaller path leading to a clearing.",
+        "Inside, stands 3 small goblins. Prepare for combat!"
+      ],
+      "encounter": { "goblin": 3 },
+      "level_up": true,
+      "continue_prompt": "Press Enter to continue to Chapter 2",
+      "next": "chapter2"
+    },
+    "goblins_bait": {
+      "text": [
+        "You make some noise and lay out aromatic food around you, hoping to attract a monster.",
+        "After a few minutes, you hear hushed voices leading towards a clearing.",
+        "Inside, stands 3 small goblins. Prepare for combat!"
+      ],
+      "encounter": { "goblin": 3 },
+      "level_up": true,
+      "continue_prompt": "Press Enter to continue to Chapter 2",
+      "next": "chapter2"
+    },
+
+    "chapter2": {
+      "text": "What would you like to do?",
+      "choices": [
+        { "text": "Inspect goblin footprints", "goto": "fairies_footprints" },
+        { "text": "Keep searching",            "goto": "fairies_dust" }
+      ]
+    },
+
+    "fairies_footprints": {
+      "text": [
+        "You examine the footprints left by the goblins — clearly not the culprits.",
+        "As you wonder who else could be responsible, you hear giggling up ahead.",
+        "Following the sound, you come upon a clearing with 2 fairies inside. Prepare for combat!"
+      ],
+      "encounter": { "fairy": 2 },
+      "level_up": true,
+      "continue_prompt": "Press Enter to continue to Chapter 3",
+      "next": "chapter3"
+    },
+    "fairies_dust": {
+      "text": [
+        "As you look around, you notice shimmering magical dust on the branches.",
+        "Following the trail, you come upon a clearing with 2 fairies inside. Prepare for combat!"
+      ],
+      "encounter": { "fairy": 2 },
+      "level_up": true,
+      "continue_prompt": "Press Enter to continue to Chapter 3",
+      "next": "chapter3"
+    },
+
+    "chapter3": {
+      "text": "What would you like to do?",
+      "choices": [
+        { "text": "Inspect fairy footprints", "goto": "troll_footprints" },
+        { "text": "Keep searching",           "goto": "troll_fabric" }
+      ]
+    },
+
+    "troll_footprints": {
+      "text": [
+        "You examine the footprints left by the fairies — not the culprits either.",
+        "As you wonder who is truly responsible, you hear loud growling up ahead.",
+        "Following the noise, you come upon a clearing with a large Troll inside. Prepare for combat!"
+      ],
+      "encounter": { "troll": 1 },
+      "fight_prompt": "Press Enter to start boss combat",
+      "next": "ending"
+    },
+    "troll_fabric": {
+      "text": [
+        "You notice a large piece of fabric strung on the branches, along with smoke rising ahead.",
+        "Following the smoke, you come upon a clearing with a large Troll inside. Prepare for combat!"
+      ],
+      "encounter": { "troll": 1 },
+      "fight_prompt": "Press Enter to start boss combat",
+      "next": "ending"
+    },
+
+    "ending": {
+      "text": [
+        "Once the Troll has been defeated, it's evident it was the culprit behind those monster tracks.",
+        "You head back to town to receive your payment and deliver the good news,",
+        "tired but victorious from your day of monster fighting.",
+        "",
+        "Congratulations! You've successfully completed Mageborne: Beta Test Release!",
+        "The full Godot version will be released soon, and the full base game afterwards."
+      ],
+      "end": true
+    }
+  }
+}

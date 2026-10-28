@@ -1,0 +1,106 @@
+{
+  "title": "The Slime Cellar",
+  "author": "Example Mod",
+  "description": "A short test adventure that uses the mod's own monsters.",
+  "start": "start",
+  "scenes": {
+    "start": {
+      "text": [
+        "The innkeeper of Emberpine begs {name} to clear out his cellar.",
+        "Something green has been oozing out from under the door all week."
+      ],
+      "next": "door"
+    },
+    "door": {
+      "text": "How do you get in?",
+      "choices": [
+        {
+          "text": "Kick the door down",
+          "goto": "front_fight",
+          "check": {
+            "stat": "strength",
+            "dc": 12,
+            "label": "the kick",
+            "fail_text": "The door doesn't budge. Ow."
+          }
+        },
+        {
+          "text": "Pick the lock",
+          "goto": "front_fight",
+          "check": {
+            "stat": "dexterity",
+            "dc": 14,
+            "label": "lockpicking",
+            "fail_text": "The lock jams and the noise wakes everything up!",
+            "fail_goto": "back_fight"
+          }
+        },
+        {
+          "text": "Sneak around the back",
+          "goto": "back_fight"
+        }
+      ]
+    },
+    "front_fight": {
+      "text": [
+        "The door swings open. Two slimes bubble up, with a wisp floating behind them!"
+      ],
+      "encounter": {
+        "slime": 2,
+        "wisp": 1
+      },
+      "level_up": true,
+      "next": "deeper"
+    },
+    "back_fight": {
+      "text": [
+        "You slip in through the coal chute. A slime and a wisp spot you right away!"
+      ],
+      "encounter": {
+        "slime": 1,
+        "wisp": 1
+      },
+      "level_up": true,
+      "next": "deeper"
+    },
+    "ending": {
+      "text": [
+        "The cellar is quiet at last. The innkeeper pays you in free soup.",
+        "",
+        "THE END"
+      ],
+      "end": true
+    },
+    "deeper": {
+      "text": [
+        "Behind the barrels, a stone staircase leads even deeper.",
+        "Something is hissing down there...",
+        "",
+        "Do you go down?"
+      ],
+      "choices": [
+        {
+          "text": "Descend",
+          "goto": "deep_fight"
+        },
+        {
+          "text": "That's enough soup-related heroics for one day",
+          "goto": "ending"
+        }
+      ]
+    },
+    "deep_fight": {
+      "text": [
+        "A medusa coils on the bottom step. Don't meet her gaze for long!",
+        "A hungry leech buzzes at her side."
+      ],
+      "encounter": {
+        "medusa": 1,
+        "leech": 1
+      },
+      "fight_prompt": "Press Enter to face the medusa",
+      "level_up": true,
+      "next": "ending"
+    }
+  }
+}

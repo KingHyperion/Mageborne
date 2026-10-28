@@ -1,0 +1,34 @@
+{
+  "slime": {
+    "emoji": "🟢",
+    "hp": 6,
+    "attack": 2,
+    "chase_radius": 4,
+    "atk_min": 1,
+    "atk_max": 1
+  },
+
+  "medusa": {
+    "emoji": "🐍",
+    "hp": 16,
+    "attack": 4,
+    "chase_radius": 6,
+    "atk_min": 2,
+    "atk_max": 3,
+    "abilities": [
+      { "type": "stun", "turns": 2, "range": 4, "cooldown": 5,
+        "text": "{emoji} {name} locks eyes with you... you turn to stone for {turns} turns!" }
+    ]
+  },
+
+  "leech": {
+    "emoji": "🦟",
+    "hp": 8,
+    "attack": 2,
+    "chase_radius": 6,
+    "speed": 2,
+    "abilities": [
+      { "type": "drain", "amount": 3, "cooldown": 3 }
+    ]
+  }
+}

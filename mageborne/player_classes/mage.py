@@ -8,8 +8,9 @@ class Mage(Player):
 
     strength     = 8
     dexterity    = 12
-    constitution = 13
-    intelligence = 15
+    constitution = 12
+    intelligence = 17
 
-    attack    = 5
-    atk_range = 5
+    attack    = 6
+    atk_range = 4
+    speed     = 2

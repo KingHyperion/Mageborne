@@ -1,3 +1,4 @@
+import copy
 import math
 
 from config import GRID_SIZE
@@ -6,8 +7,8 @@ from config import GRID_SIZE
 class Monster:
     """Base class for every monster.
 
-    Subclasses override the class attributes below to change HP,
-    damage, chase radius, and attack range.
+    Subclasses override the class attributes below to change HP, damage, speed,
+    chase radius, attack range, and special abilities.
     """
 
     name         = "monster"
@@ -17,20 +18,39 @@ class Monster:
     chase_radius = 4
     atk_min      = 1
     atk_max      = 1
+    speed        = 1          # tiles it can walk per turn
+    abilities    = []         # special moves, e.g. [Stun(turns=2)] - see abilities.py
 
     def __init__(self, x, y):
         self.x, self.y = x, y
         self.hp        = self.max_hp
         self.alive     = True
+        # every monster gets its own copy, so cooldowns aren't shared
+        self.abilities = [copy.deepcopy(a) for a in type(self).abilities]
+
+    def take_turn(self, game):
+        """One monster turn: try abilities, otherwise walk toward the player and attack.
+        Override this for completely custom behavior."""
+        for ability in self.abilities:
+            ability.tick()
+        for ability in sorted(self.abilities, key=lambda a: not a.busy):   # mid-wind-up first
+            if ability.ready(self, game) and ability.use(self, game):
+                return
+        self.move_toward(game.player_x, game.player_y, game.blocked_tiles(self))
+        if self.can_attack(game.player_x, game.player_y):
+            game.attack_player(self)
 
     def move_toward(self, px, py, occupied):
-        dist = math.dist((self.x, self.y), (px, py))
-        if dist > self.chase_radius:
-            return
-        if dist > self.atk_max:
-            self._step(px, py, occupied, approach=True)
-        elif dist < self.atk_min:
-            self._step(px, py, occupied, approach=False)
+        for _ in range(self.speed):
+            dist = math.dist((self.x, self.y), (px, py))
+            if dist > self.chase_radius:
+                return
+            if dist > self.atk_max:
+                self._step(px, py, occupied, approach=True)
+            elif dist < self.atk_min:
+                self._step(px, py, occupied, approach=False)
+            else:
+                return
 
     def _step(self, px, py, occupied, approach):
         dx = 0 if px == self.x else int(math.copysign(1, px - self.x))

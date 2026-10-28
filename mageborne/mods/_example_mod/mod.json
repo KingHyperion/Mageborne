@@ -1,0 +1,6 @@
+{
+  "name": "Example Mod",
+  "author": "Mageborne",
+  "version": "1.0",
+  "description": "Adds a Slime, a Wisp, a Paladin class and a short story. Rename this folder to 'example_mod' to turn it on."
+}
