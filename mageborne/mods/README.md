@@ -8,10 +8,29 @@ Mods can add **monsters** (with special abilities), **character classes** and **
 1. Find the `_example_mod` folder in here and **rename it to `example_mod`** (drop the underscore).
 2. Run `main.py`. You'll see `✔ Example Mod ...` at the top, a new **Paladin** class, and a new
    **adventure menu** with "The Slime Cellar" (it includes a medusa that stuns you!).
-3. To make your own mod: copy `_example_mod`, give the copy a new name, delete what you don't need,
-   and edit the rest.
+3. To make your own mod, either copy `_example_mod` and give the copy a new name, or let the game
+   **generate a template for you** (next section).
 
 Folders starting with `_` or `.` are ignored, so that's also how you switch a mod off.
+
+## Generate a template (easiest way to start)
+
+Two ways, both create a ready-to-edit folder in `mods/` that already loads and plays:
+
+- **In the game:** main menu → **Create a mod template**. It asks for a name, your name, and which parts you want.
+  Press Enter for the default (monsters, classes and a story); type letters to choose (A monsters, B classes, C story, D Python file).
+- **From a terminal:**
+
+  ```
+  python main.py --new-mod "Frost Pack" --author "Your Name" --only monsters,classes,story,python
+  ```
+
+  `--author` and `--only` are optional (`--only` default: `monsters,classes,story`).
+
+For a mod called "Frost Pack" you get `mods/frost_pack/` containing `mod.json`, `monsters.json` (a monster with a stun ability, named
+`frost_pack_monster`), `classes.json` ("Frost Pack Hero"), `story.json` ("Frost Pack Adventure", which fights your monster),
+optionally `frost_pack.py` (a Python monster with commented-out examples of a class and a custom ability), and a short `README.md`.
+Edit the files, restart the game, and your changes are in. It won't overwrite an existing mod folder.
 
 ## What goes in a mod folder
 
@@ -199,6 +218,11 @@ just picks again).
 
 **Optional polish:** `continue_prompt` (the "Press Enter ..." text after a scene) and
 `fight_prompt` (the text before a fight).
+
+**Saves and scene names.** The game autosaves at the start of every scene and remembers the scene's *name*
+(e.g. `"chapter2"`), so **once people are playing your story, avoid renaming or deleting scenes**. A save pointing at a scene
+that no longer exists can't be continued (the player gets a clear message). Adding scenes and editing text is always safe. A
+save also remembers the story's `title`, so keep that stable too.
 
 **Balancing fights:** HP resets at the start of every fight. Each round the player walks, then acts
 (Attack, Rest for 20% of max HP, or Guard to halve damage), then monsters act. Test your fights as

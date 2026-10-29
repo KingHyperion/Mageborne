@@ -7,12 +7,17 @@ import json
 import random
 from difflib import get_close_matches
 
+import savegame
 from game import start_encounter
 from monsters import MONSTER_TYPES
 from monsters.spawner import spawn_capacity
 from ui import clear_screen, menu_keys, prompt_choice
 
 STORIES = {}   # story title -> story dict
+
+
+class SaveAndQuit(Exception):
+    """Raised when the player types SAVE at a choice prompt."""
 
 STATS        = ("strength", "dexterity", "constitution", "intelligence")
 STORY_KEYS   = {"title", "author", "description", "start", "scenes"}
@@ -170,9 +175,13 @@ def _ask_choice(scene, player):
     keys    = menu_keys(len(choices))
     header  = "\n".join(_fill(l, player) for l in _lines(scene.get("text")))
     options = "".join(f"  {k}) {_fill(c['text'], player)}\n" for k, c in zip(keys, choices))
+    options += "\n  (progress is saved automatically - type SAVE to save and quit)\n"
     while True:
         clear_screen()
-        pick = choices[keys.index(prompt_choice(f"\n{header}\n{options}", keys))]
+        answer = prompt_choice(f"\n{header}\n{options}", keys, extras=("SAVE",))
+        if answer == "SAVE":
+            raise SaveAndQuit()
+        pick = choices[keys.index(answer)]
         check = pick.get("check")
         if not check:
             return pick["goto"]
@@ -199,7 +208,8 @@ def _play_scene(scene, player, via_choice):
 
     if scene.get("encounter"):
         input(f"\n  [{scene.get('fight_prompt', 'Press Enter to start combat')}]")
-        start_encounter(scene["encounter"], player)
+        start_encounter(scene["encounter"], player,
+                        defeat_note="💾 Your progress is saved - choose Continue next time to retry this fight.")
     if scene.get("level_up"):
         player.level_up()
         clear_screen()
@@ -211,9 +221,36 @@ def _play_scene(scene, player, via_choice):
     return scene.get("next"), False
 
 
-def run_story(story, player):
-    scenes   = story["scenes"]
-    scene_id = story.get("start", "start")
+def _checkpoint(story, player, scene_id, completed=False):
+    """Save progress. Returns False (after telling the player once) if saving isn't possible."""
+    try:
+        savegame.write_save(player, story, scene_id, completed)
+        return True
+    except OSError as e:
+        print(f"\n  ⚠ Couldn't save your progress ({e}). The game will carry on without saving.")
+        input("  [Press Enter to continue]")
+        return False
+
+
+def run_story(story, player, start_scene=None):
+    """Play a story, saving at the start of every scene.
+    Returns "saved" if the player chose to save and quit, otherwise "finished"."""
+    scenes     = story["scenes"]
+    scene_id   = start_scene or story.get("start", "start")
     via_choice = False
+    saving     = True
+    last       = scene_id
     while scene_id is not None:
-        scene_id, via_choice = _play_scene(scenes[scene_id], player, via_choice)
+        last = scene_id
+        if saving:
+            saving = _checkpoint(story, player, scene_id)
+        try:
+            scene_id, via_choice = _play_scene(scenes[scene_id], player, via_choice)
+        except SaveAndQuit:
+            if saving:
+                _checkpoint(story, player, last)
+            print("\n  💾 Progress saved. Choose Continue next time to pick up right here.")
+            return "saved"
+    if saving:
+        _checkpoint(story, player, last, completed=True)
+    return "finished"

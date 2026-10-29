@@ -4,6 +4,7 @@ import os
 BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
 MODS_DIR    = os.path.join(BASE_DIR, "mods")      # drop mod folders in here
 STORIES_DIR = os.path.join(BASE_DIR, "stories")   # built-in storylines
+SAVES_DIR   = os.path.join(BASE_DIR, "saves")     # save files (created when you first save)
 
 # ── Tile emojis ───────────────────────────────────────────────
 FLOOR = "🟫"

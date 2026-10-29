@@ -7,7 +7,7 @@ from ui import clear_screen, prompt_choice
 
 
 class Game:
-    def __init__(self, player, monster_counts=None):
+    def __init__(self, player, monster_counts=None, defeat_note=None):
         if monster_counts is None:
             monster_counts = {"goblin": 1, "archer": 1, "fairy": 1}
 
@@ -24,6 +24,7 @@ class Game:
         self.turn           = 1
         self.monsters       = spawn_monsters(monster_counts)
         self._needs_pause   = False
+        self.defeat_note    = defeat_note   # optional extra line shown if the player loses
 
     # ══ Toolbox for monsters and abilities (this is what mods call) ═══════
     def say(self, text):
@@ -245,9 +246,11 @@ class Game:
             self.turn += 1
         self.render()
         print("  💀 You have been defeated...")
+        if self.defeat_note:
+            print("\n  " + self.defeat_note)
         input("\n  [Press Enter to exit]")
         sys.exit()
 
 
-def start_encounter(counts, player):
-    Game(player, counts).run()
+def start_encounter(counts, player, defeat_note=None):
+    Game(player, counts, defeat_note).run()

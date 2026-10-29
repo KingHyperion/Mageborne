@@ -13,10 +13,11 @@ def menu_keys(count):
     return [str(i + 1) for i in range(count)]
 
 
-def prompt_choice(prompt, valid_options):
+def prompt_choice(prompt, valid_options, extras=()):
+    """Ask until the answer is one of valid_options (or one of the extra typed commands, e.g. "SAVE")."""
     while True:
         choice = input(prompt).strip().upper()
-        if choice in valid_options:
+        if choice in valid_options or choice in extras:
             return choice
         if len(valid_options) <= 8:
             valid_str = ", ".join(sorted(valid_options))
